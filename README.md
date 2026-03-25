@@ -2,20 +2,6 @@
 
 > *"An app that knows your energy, adapts to your mood, and helps you focus on what matters - because you're not a machine."*
 
-## 📸 Screenshots
-
-### Main Interface
-![Pulse App](screenshot1.png)
-
-### Task Management
-![Task Pipeline](screenshot2.png)
-
-### Energy Check-in
-![Mood Check-in](screenshot3.png)
-
-### Focus Timer
-![Focus Section](screenshot4.png)
-
 ---
 
 ## 🌟 Features
