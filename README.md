@@ -1,40 +1,154 @@
-𝐏𝐮𝐥𝐬𝐞 – 𝐄𝐦𝐨𝐭𝐢𝐨𝐧𝐚𝐥𝐥𝐲 𝐈𝐧𝐭𝐞𝐥𝐥𝐢𝐠𝐞𝐧𝐭 𝐓𝐨-𝐃𝐨 𝐀𝐩𝐩
+# Pulse – Emotionally Intelligent To-Do App
 
-𝗢𝘃𝗲𝗿𝘃𝗶𝗲𝘄
+> *"An app that knows your energy, adapts to your mood, and helps you focus on what matters - because you're not a machine."*
 
-Pulse is a smart to-do application that adapts to the user’s mood and energy level. Unlike traditional task managers, Pulse changes its interface, task suggestions, and focus time based on how the user feels, helping users stay productive without feeling overwhelmed.
+## 📸 Screenshots
 
-𝗞𝗲𝘆 𝗙𝗲𝗮𝘁𝘂𝗿𝗲𝘀
+### Main Interface
+![Pulse App](screenshot1.png)
 
-Energy/Mood based task suggestions
-AI-powered task breakdown into subtasks
-Mood-based chatbot for emotional support
-Daily motivational Sanskrit shloka
-Focus timer (Pomodoro)
-Weekly productivity insights
-Adaptive UI theme based on mood
+### Task Management
+![Task Pipeline](screenshot2.png)
 
-𝗧𝗲𝘅𝗵 𝗦𝘁𝗮𝗰𝗸
-React
-TypeScript
-Vite
-Tailwind CSS
-Zustand (State Management)
-Framer Motion (Animations)
-LocalStorage (Data Persistence)
+### Energy Check-in
+![Mood Check-in](screenshot3.png)
 
-𝐇𝐨𝐰 𝐭𝐨 𝐑𝐮𝐧
+### Focus Timer
+![Focus Section](screenshot4.png)
+
+---
+
+## 🌟 Features
+
+### 🎯 Energy-Based Task Management
+- **5 Mood States**: Energized 🔥, Focused 💪, Steady 🌊, Tired 🌙, Struggling 😔
+- **Adaptive UI**: Entire app theme changes based on your mood
+- **Smart Suggestions**: Task recommendations match your current energy level
+
+### 🙏 Daily Shloka
+- Curated Sanskrit verses from Bhagavad Gita, Upanishads, and Vedas
+- English transliteration and meaning
+- Daily wisdom for spiritual growth
+
+### 💬 Mood Chatbot
+- Opens with "Namaste! How was your day?"
+- Detects your mood from text
+- Provides empathetic responses and suggestions
+- Emotional support when you need it most
+
+### ⚡ AI Task Breakdown
+- Automatically splits complex tasks into manageable subtasks
+- Energy level suggestions for each task
+- Category organization (Work, Personal, Health, Creative)
+
+### ⏱️ Focus Timer
+- Pomodoro-style timer
+- Duration adapts to your energy level
+- Beautiful circular progress visualization
+
+### 📊 Weekly Insights
+- Track your productivity
+- See completion rates
+- Motivational weekly summaries
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| React 18 | UI Framework |
+| TypeScript | Type Safety |
+| Vite | Fast Build Tool |
+| Tailwind CSS | Styling |
+| Zustand | State Management |
+| Framer Motion | Animations |
+| Phosphor Icons | Icon Library |
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
+
+# Build for production
 npm run build
+
+# Preview production build
 npm run preview
-Project Goal
+```
 
-𝗧𝗵𝗲 𝗴𝗼𝗮𝗹 𝗼𝗳 𝗣𝘂𝗹𝘀𝗲 𝗶𝘀 𝘁𝗼 𝗰𝗼𝗺𝗯𝗶𝗻𝗲 𝗽𝗿𝗼𝗱𝘂𝗰𝘁𝗶𝘃𝗶𝘁𝘆 + 𝗲𝗺𝗼𝘁𝗶𝗼𝗻𝗮𝗹 𝗶𝗻𝘁𝗲𝗹𝗹𝗶𝗴𝗲𝗻𝗰𝗲 𝘁𝗼 𝗵𝗲𝗹𝗽 𝘂𝘀𝗲𝗿𝘀 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲 𝘁𝗮𝘀𝗸𝘀 𝗶𝗻 𝗮 𝗺𝗶𝗻𝗱𝗳𝘂𝗹 𝗮𝗻𝗱 𝘀𝘁𝗿𝗲𝘀𝘀-𝗳𝗿𝗲𝗲 𝘄𝗮𝘆.
+---
 
-𝗙𝘂𝘁𝘂𝗿𝗲 𝗜𝗺𝗽𝗿𝗼𝘃𝗲𝗺𝗲𝗻𝘁𝘀
-OpenAI integration
-Cloud sync
-Mobile app version
-Team collaboration
-Habit tracking
+## 📁 Project Structure
+
+```
+Pulse/
+├── src/
+│   ├── components/       # React components
+│   │   ├── DailyShloka.tsx      # Daily wisdom
+│   │   ├── MoodChatbot.tsx      # Emotional support
+│   │   ├── TaskPipeline.tsx     # Task organization
+│   │   ├── FocusTimer.tsx       # Pomodoro timer
+│   │   └── ...
+│   ├── stores/           # Zustand state
+│   ├── data/             # Shloka collection
+│   └── utils/            # Helper functions
+└── SPEC.md              # Project specification
+```
+
+---
+
+## 💡 Key Code Example
+
+### Energy-Based Theming
+```typescript
+// One line changes the entire app theme!
+useEffect(() => {
+  document.body.className = `energy-${level}`;
+}, [level]);
+```
+
+### Mood Detection
+```typescript
+const responses = {
+  struggling: "I hear you. You're not alone. 💙",
+  bad: "Difficult days happen. Take it step by step.",
+  good: "Great! Keep that momentum going!",
+};
+```
+
+---
+
+## 🎓 Philosophy
+
+> **"You have the right to work, but never to its fruits."**
+> - Bhagavad Gita 2.47
+
+Pulse combines modern productivity with emotional intelligence and ancient wisdom to create an app that truly serves humans - meeting them where they are.
+
+---
+
+## 🔮 Future Enhancements
+
+- [ ] OpenAI integration for smarter task breakdown
+- [ ] Mobile app (React Native)
+- [ ] Cloud sync across devices
+- [ ] Team collaboration features
+- [ ] Push notifications
+- [ ] Dark mode
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+**Built with ❤️ using React + TypeScript + Ancient Wisdom**
