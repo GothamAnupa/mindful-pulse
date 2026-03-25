@@ -4,6 +4,22 @@
 
 ---
 
+## 📸 Screenshots
+
+### Main Interface
+![Main Interface](S-1.png)
+
+### Task Management
+![Task Pipeline](S-2.png)
+
+### Daily Shloka
+![Daily Shloka](S-3.png)
+
+### Focus Section
+![Focus Timer](S-5.png)
+
+---
+
 ## 🌟 Features
 
 ### 🎯 Energy-Based Task Management
