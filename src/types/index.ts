@@ -40,12 +40,24 @@ export interface Session {
   completed: boolean;
 }
 
+export interface NotificationPreferences {
+  enabled: boolean;
+  taskReminders: boolean;
+  habitReminders: boolean;
+  dailyCheckIn: boolean;
+  weeklyInsights: boolean;
+  quietHoursEnabled: boolean;
+  quietHoursStart: string;
+  quietHoursEnd: string;
+}
+
 export interface Settings {
   checkInFrequency: 'once' | 'twice' | 'manual';
   snoozeDuration: number;
   notificationStyle: 'encouraging' | 'neutral' | 'minimal';
   soundEnabled: boolean;
   defaultTimerDuration: number;
+  notifications: NotificationPreferences;
 }
 
 export interface TaskBreakdown {

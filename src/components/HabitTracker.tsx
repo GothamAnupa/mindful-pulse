@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash, Check, Fire, Trophy, Target } from '@phosphor-icons/react';
 import { useHabitStore, type Habit } from '../stores/habitStore';
+import { useNotifications } from '../hooks/useNotifications';
 
 const presetHabits = [
   { name: 'Meditate', icon: '🧘', color: '#8B5CF6' },
@@ -20,11 +21,28 @@ export function HabitTracker() {
   const [newHabitName, setNewHabitName] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('✨');
   const [selectedColor, setSelectedColor] = useState('#8B5CF6');
+  const { notifyHabitReminder } = useNotifications();
 
   const today = new Date().toISOString().split('T')[0];
   const { completed, total } = getTodayProgress();
   const { current: currentStreak, best: bestStreak } = getAllStreaks();
   const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  useEffect(() => {
+    const checkAndNotify = () => {
+      const now = new Date();
+      const hour = now.getHours();
+      if (hour === 9 && habits.length > 0) {
+        const incomplete = habits.filter(h => !isHabitCompletedToday(h.id));
+        if (incomplete.length > 0) {
+          notifyHabitReminder(incomplete[0].name, incomplete[0].streak);
+        }
+      }
+    };
+    
+    const interval = setInterval(checkAndNotify, 3600000);
+    return () => clearInterval(interval);
+  }, [habits, isHabitCompletedToday, notifyHabitReminder]);
 
   const handleAddHabit = () => {
     if (!newHabitName.trim()) return;

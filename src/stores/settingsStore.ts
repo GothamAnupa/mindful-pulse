@@ -7,6 +7,7 @@ interface SettingsStore extends Settings {
   openSettings: () => void;
   closeSettings: () => void;
   updateSettings: (updates: Partial<Settings>) => void;
+  updateNotificationPreferences: (updates: Partial<Settings['notifications']>) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -18,10 +19,24 @@ export const useSettingsStore = create<SettingsStore>()(
       soundEnabled: true,
       defaultTimerDuration: 25,
       isSettingsOpen: false,
+      notifications: {
+        enabled: false,
+        taskReminders: true,
+        habitReminders: true,
+        dailyCheckIn: true,
+        weeklyInsights: true,
+        quietHoursEnabled: false,
+        quietHoursStart: '22:00',
+        quietHoursEnd: '08:00'
+      },
 
       openSettings: () => set({ isSettingsOpen: true }),
       closeSettings: () => set({ isSettingsOpen: false }),
-      updateSettings: (updates) => set((state) => ({ ...state, ...updates }))
+      updateSettings: (updates) => set((state) => ({ ...state, ...updates })),
+      updateNotificationPreferences: (updates) => 
+        set((state) => ({ 
+          notifications: { ...state.notifications, ...updates } 
+        }))
     }),
     {
       name: 'pulse-settings'

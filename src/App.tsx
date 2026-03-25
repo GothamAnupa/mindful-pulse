@@ -17,6 +17,7 @@ import { ListBullets, Target, BookOpen } from '@phosphor-icons/react';
 import { useEnergyStore } from './stores/energyStore';
 import { useTaskStore } from './stores/taskStore';
 import { useThemeStore } from './stores/themeStore';
+import { useNotifications } from './hooks/useNotifications';
 import type { EnergyLevel, Task } from './types';
 
 type Tab = 'tasks' | 'habits' | 'journal';
@@ -25,6 +26,7 @@ function App() {
   const { level, checkIn, shouldPromptCheckIn } = useEnergyStore();
   const { tasks, initializeSampleTasks } = useTaskStore();
   const { theme } = useThemeStore();
+  const { notifyCheckIn, notifyWeeklyInsights } = useNotifications();
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [activeTimerTaskId, setActiveTimerTaskId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -42,10 +44,23 @@ function App() {
     if (shouldPromptCheckIn()) {
       const timer = setTimeout(() => {
         setShowCheckIn(true);
+        notifyCheckIn();
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [shouldPromptCheckIn]);
+  }, [shouldPromptCheckIn, notifyCheckIn]);
+
+  useEffect(() => {
+    const checkWeeklyInsights = () => {
+      const now = new Date();
+      if (now.getDay() === 0 && now.getHours() === 10) {
+        notifyWeeklyInsights();
+      }
+    };
+    
+    const interval = setInterval(checkWeeklyInsights, 3600000);
+    return () => clearInterval(interval);
+  }, [notifyWeeklyInsights]);
 
   useEffect(() => {
     const isDarkMode = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);

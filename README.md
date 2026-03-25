@@ -53,6 +53,12 @@
 - See completion rates
 - Motivational weekly summaries
 
+### 🔔 Push Notifications
+- Browser notifications for tasks and habits
+- Customizable notification preferences
+- Quiet hours support
+- Three notification styles (Encouraging, Neutral, Minimal)
+
 ---
 
 ## 🛠️ Tech Stack
@@ -142,8 +148,8 @@ Pulse combines modern productivity with emotional intelligence and ancient wisdo
 - [ ] Mobile app (React Native)
 - [ ] Cloud sync across devices
 - [ ] Team collaboration features
-- [ ] Push notifications
-- [ ] Dark mode
+- [x] Push notifications
+- [x] Dark mode
 
 ---
 

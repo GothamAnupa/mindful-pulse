@@ -514,6 +514,47 @@ function getMotivationalQuote(completed, carried): string {
 
 ---
 
+## Feature 9: Push Notifications
+
+### What It Does
+Enables browser push notifications to remind users about tasks, habits, check-ins, and weekly insights without keeping the app open.
+
+### Notification Types
+- **Task Reminders**: Reminds about pending tasks with encouraging messages
+- **Habit Reminders**: Encourages habit completion with streak information
+- **Daily Check-in**: Prompts for morning energy check-in
+- **Weekly Insights**: Notifies when weekly summary is ready
+
+### Features
+```typescript
+interface NotificationPreferences {
+  enabled: boolean;
+  taskReminders: boolean;
+  habitReminders: boolean;
+  dailyCheckIn: boolean;
+  weeklyInsights: boolean;
+  quietHoursEnabled: boolean;
+  quietHoursStart: string;
+  quietHoursEnd: string;
+}
+```
+
+### Notification Styles
+Three notification styles available:
+- **Encouraging**: Warm, supportive messages with emojis
+- **Neutral**: Straightforward task reminders
+- **Minimal**: Only essential alerts
+
+### Quiet Hours
+Users can set quiet hours to prevent notifications during specified times (e.g., 10 PM - 8 AM).
+
+### Browser Support
+- Uses Web Notifications API
+- Handles permission requests gracefully
+- Shows helpful message if notifications are blocked by browser
+
+---
+
 # 7. DEVELOPMENT WORKFLOW
 
 ## Development Pipeline

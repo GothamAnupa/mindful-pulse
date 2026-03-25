@@ -1,8 +1,28 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bell, Check, Moon, Sun, Desktop } from '@phosphor-icons/react';
+import { X, Bell, Check, Moon, Sun, Desktop, BellSlash, Clock, Megaphone } from '@phosphor-icons/react';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useThemeStore } from '../stores/themeStore';
+import { useNotifications } from '../hooks/useNotifications';
+
+function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (value: boolean) => void }) {
+  return (
+    <button
+      onClick={() => onChange(!enabled)}
+      className={`
+        relative w-12 h-6 rounded-full transition-colors
+        ${enabled ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'}
+      `}
+    >
+      <span
+        className={`
+          absolute top-1 w-4 h-4 bg-white rounded-full transition-transform
+          ${enabled ? 'left-7' : 'left-1'}
+        `}
+      />
+    </button>
+  );
+}
 
 export function SettingsPanel() {
   const {
@@ -12,15 +32,32 @@ export function SettingsPanel() {
     notificationStyle,
     soundEnabled,
     defaultTimerDuration,
-    updateSettings
+    notifications,
+    updateSettings,
+    updateNotificationPreferences
   } = useSettingsStore();
 
   const { theme, setTheme } = useThemeStore();
+  const { permission, requestPermission } = useNotifications();
+  const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
 
   useEffect(() => {
     const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     document.body.classList.toggle('dark', isDark);
   }, [theme]);
+
+  const handleEnableNotifications = async () => {
+    if (permission === 'granted') {
+      updateNotificationPreferences({ enabled: true });
+    } else if (permission === 'default') {
+      const granted = await requestPermission();
+      if (granted) {
+        updateNotificationPreferences({ enabled: true });
+      }
+    } else {
+      setShowPermissionPrompt(true);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -87,6 +124,176 @@ export function SettingsPanel() {
                 </div>
               </section>
 
+              {/* Push Notifications */}
+              <section>
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                  Push Notifications
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <Megaphone size={24} className="text-purple-500" />
+                      <div>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">Enable Notifications</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {permission === 'denied' ? 'Blocked by browser - check settings' : 'Get reminders and updates'}
+                        </p>
+                      </div>
+                    </div>
+                    <Toggle 
+                      enabled={notifications.enabled} 
+                      onChange={(value) => {
+                        if (value) {
+                          handleEnableNotifications();
+                        } else {
+                          updateNotificationPreferences({ enabled: false });
+                        }
+                      }} 
+                    />
+                  </div>
+
+                  {notifications.enabled && (
+                    <>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Notification Types</p>
+                        
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center gap-3">
+                            <Check size={18} className="text-gray-400" />
+                            <span className="text-sm text-gray-900 dark:text-gray-100">Task Reminders</span>
+                          </div>
+                          <Toggle 
+                            enabled={notifications.taskReminders} 
+                            onChange={(v) => updateNotificationPreferences({ taskReminders: v })} 
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center gap-3">
+                            <Check size={18} className="text-gray-400" />
+                            <span className="text-sm text-gray-900 dark:text-gray-100">Habit Reminders</span>
+                          </div>
+                          <Toggle 
+                            enabled={notifications.habitReminders} 
+                            onChange={(v) => updateNotificationPreferences({ habitReminders: v })} 
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center gap-3">
+                            <Check size={18} className="text-gray-400" />
+                            <span className="text-sm text-gray-900 dark:text-gray-100">Daily Check-in</span>
+                          </div>
+                          <Toggle 
+                            enabled={notifications.dailyCheckIn} 
+                            onChange={(v) => updateNotificationPreferences({ dailyCheckIn: v })} 
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center gap-3">
+                            <Check size={18} className="text-gray-400" />
+                            <span className="text-sm text-gray-900 dark:text-gray-100">Weekly Insights</span>
+                          </div>
+                          <Toggle 
+                            enabled={notifications.weeklyInsights} 
+                            onChange={(v) => updateNotificationPreferences({ weeklyInsights: v })} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center gap-3">
+                            <Clock size={18} className="text-gray-400" />
+                            <span className="text-sm text-gray-900 dark:text-gray-100">Quiet Hours</span>
+                          </div>
+                          <Toggle 
+                            enabled={notifications.quietHoursEnabled} 
+                            onChange={(v) => updateNotificationPreferences({ quietHoursEnabled: v })} 
+                          />
+                        </div>
+
+                        {notifications.quietHoursEnabled && (
+                          <div className="flex gap-3 px-3">
+                            <div className="flex-1">
+                              <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Start</label>
+                              <input
+                                type="time"
+                                value={notifications.quietHoursStart}
+                                onChange={(e) => updateNotificationPreferences({ quietHoursStart: e.target.value })}
+                                className="w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">End</label>
+                              <input
+                                type="time"
+                                value={notifications.quietHoursEnd}
+                                onChange={(e) => updateNotificationPreferences({ quietHoursEnd: e.target.value })}
+                                className="w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </section>
+
+              {/* Notification Style */}
+              <section>
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+                  Notification Style
+                </h3>
+                
+                <div className="space-y-2">
+                  {[
+                    { value: 'encouraging', label: 'Encouraging', description: 'Warm, supportive messages' },
+                    { value: 'neutral', label: 'Neutral', description: 'Straightforward reminders' },
+                    { value: 'minimal', label: 'Minimal', description: 'Only essential alerts' }
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => updateSettings({ notificationStyle: option.value as 'encouraging' | 'neutral' | 'minimal' })}
+                      className={`
+                        w-full p-3 rounded-lg border-2 text-left transition-all
+                        ${notificationStyle === option.value
+                          ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{option.label}</span>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{option.description}</p>
+                        </div>
+                        {notificationStyle === option.value && (
+                          <Check size={20} className="text-purple-500" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between p-3 mt-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <Bell size={20} className="text-gray-500 dark:text-gray-400" />
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">Sound effects</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Play sounds on timer completion</p>
+                    </div>
+                  </div>
+                  <Toggle 
+                    enabled={soundEnabled} 
+                    onChange={(v) => updateSettings({ soundEnabled: v })} 
+                  />
+                </div>
+              </section>
+
               {/* Check-in */}
               <section>
                 <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
@@ -117,74 +324,6 @@ export function SettingsPanel() {
                         {option.label}
                       </button>
                     ))}
-                  </div>
-                </div>
-              </section>
-
-              {/* Notifications */}
-              <section>
-                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
-                  Notifications
-                </h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                      Notification style
-                    </label>
-                    <div className="space-y-2">
-                      {[
-                        { value: 'encouraging', label: 'Encouraging', description: 'Warm, supportive messages' },
-                        { value: 'neutral', label: 'Neutral', description: 'Straightforward reminders' },
-                        { value: 'minimal', label: 'Minimal', description: 'Only essential alerts' }
-                      ].map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => updateSettings({ notificationStyle: option.value as 'encouraging' | 'neutral' | 'minimal' })}
-                          className={`
-                            w-full p-3 rounded-lg border-2 text-left transition-all
-                            ${notificationStyle === option.value
-                              ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30'
-                              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                            }
-                          `}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="font-medium text-gray-900 dark:text-gray-100">{option.label}</span>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{option.description}</p>
-                            </div>
-                            {notificationStyle === option.value && (
-                              <Check size={20} className="text-purple-500" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <Bell size={20} className="text-gray-500 dark:text-gray-400" />
-                      <div>
-                        <span className="font-medium text-gray-900 dark:text-gray-100">Sound effects</span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Play sounds on timer completion</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => updateSettings({ soundEnabled: !soundEnabled })}
-                      className={`
-                        relative w-12 h-6 rounded-full transition-colors
-                        ${soundEnabled ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'}
-                      `}
-                    >
-                      <span
-                        className={`
-                          absolute top-1 w-4 h-4 bg-white rounded-full transition-transform
-                          ${soundEnabled ? 'left-7' : 'left-1'}
-                        `}
-                      />
-                    </button>
                   </div>
                 </div>
               </section>
@@ -240,6 +379,31 @@ export function SettingsPanel() {
               </section>
             </div>
           </motion.div>
+
+          {showPermissionPrompt && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4"
+            >
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+                <div className="text-center mb-4">
+                  <BellSlash size={48} className="mx-auto text-red-500 mb-3" />
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">Notifications Blocked</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Your browser is blocking notifications. Please enable them in your browser settings to receive reminders.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowPermissionPrompt(false)}
+                  className="w-full py-3 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-colors"
+                >
+                  Got it
+                </button>
+              </div>
+            </motion.div>
+          )}
         </>
       )}
     </AnimatePresence>
