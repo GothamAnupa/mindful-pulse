@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PaperPlaneRight, Sparkle, X } from '@phosphor-icons/react';
-import type { TaskEnergy, Category } from '../types';
+import { PaperPlaneRight, Sparkle, X, Calendar, Bell, BellSlash } from '@phosphor-icons/react';
+import type { TaskEnergy, Category, ReminderTime } from '../types';
 import { useTaskStore } from '../stores/taskStore';
+import { useReminderStore } from '../stores/reminderStore';
 import { analyzeTask } from '../utils/aiSimulation';
 import { v4 as uuid } from 'uuid';
 
@@ -18,8 +19,12 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
   const [breakdown, setBreakdown] = useState<ReturnType<typeof analyzeTask> | null>(null);
   const [selectedEnergy, setSelectedEnergy] = useState<TaskEnergy>(defaultEnergy);
   const [selectedCategory, setSelectedCategory] = useState<Category>('personal');
+  const [dueDate, setDueDate] = useState<string>('');
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState<ReminderTime>('30min');
   const inputRef = useRef<HTMLInputElement>(null);
   const { addTask, addSubtask } = useTaskStore();
+  const { addReminder } = useReminderStore();
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
@@ -48,8 +53,29 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
       title,
       energyLevel: selectedEnergy,
       category: selectedCategory,
-      recurrence: 'none'
+      recurrence: 'none',
+      dueDate: dueDate ? new Date(dueDate) : undefined,
+      reminderEnabled,
+      reminderTime
     });
+
+    if (dueDate && reminderEnabled) {
+      const reminderDateTime = new Date(dueDate);
+      if (reminderTime === 'at-time') {
+        // Keep as is
+      } else if (reminderTime === '5min') {
+        reminderDateTime.setMinutes(reminderDateTime.getMinutes() - 5);
+      } else if (reminderTime === '15min') {
+        reminderDateTime.setMinutes(reminderDateTime.getMinutes() - 15);
+      } else if (reminderTime === '30min') {
+        reminderDateTime.setMinutes(reminderDateTime.getMinutes() - 30);
+      } else if (reminderTime === '1hour') {
+        reminderDateTime.setHours(reminderDateTime.getHours() - 1);
+      } else if (reminderTime === '1day') {
+        reminderDateTime.setDate(reminderDateTime.getDate() - 1);
+      }
+      addReminder(taskId, reminderDateTime, reminderTime);
+    }
 
     if (subtasks.length > 0) {
       subtasks.forEach((st, index) => {
@@ -67,6 +93,8 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
     setShowBreakdown(false);
     setBreakdown(null);
     setIsExpanded(false);
+    setDueDate('');
+    setReminderEnabled(false);
     onTaskAdded?.();
   };
 
@@ -95,6 +123,20 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
     { value: 'medium', label: '🌊 Medium' },
     { value: 'low', label: '🌙 Low' }
   ];
+
+  const reminderOptions: { value: ReminderTime; label: string }[] = [
+    { value: 'at-time', label: 'At due time' },
+    { value: '5min', label: '5 min before' },
+    { value: '15min', label: '15 min before' },
+    { value: '30min', label: '30 min before' },
+    { value: '1hour', label: '1 hour before' },
+    { value: '1day', label: '1 day before' }
+  ];
+
+  const getTodayDateString = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
 
   return (
     <>
@@ -220,8 +262,8 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
               >
-                <div className="flex gap-4 pt-4 pb-2">
-                  <div className="flex-1">
+                <div className="flex flex-wrap gap-3 pt-4 pb-2">
+                  <div className="flex-1 min-w-[120px]">
                     <label className="text-xs text-[var(--color-text-secondary)] mb-1 block">Energy needed</label>
                     <div className="flex gap-1">
                       {energyLevels.map((level) => (
@@ -242,7 +284,7 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
                       ))}
                     </div>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-[120px]">
                     <label className="text-xs text-[var(--color-text-secondary)] mb-1 block">Category</label>
                     <select
                       value={selectedCategory}
@@ -254,7 +296,50 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
                       ))}
                     </select>
                   </div>
+                  <div className="flex-1 min-w-[140px]">
+                    <label className="text-xs text-[var(--color-text-secondary)] mb-1 block">
+                      <Calendar size={12} className="inline mr-1" />
+                      Due Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dueDate}
+                      onChange={(e) => setDueDate(e.target.value)}
+                      min={getTodayDateString()}
+                      className="w-full py-1.5 px-2 text-xs rounded-lg border border-gray-200 bg-white"
+                    />
+                  </div>
                 </div>
+
+                {dueDate && (
+                  <div className="flex items-center gap-3 pt-2 pb-3">
+                    <button
+                      type="button"
+                      onClick={() => setReminderEnabled(!reminderEnabled)}
+                      className={`
+                        flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg transition-all
+                        ${reminderEnabled
+                          ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }
+                      `}
+                    >
+                      {reminderEnabled ? <Bell size={14} /> : <BellSlash size={14} />}
+                      Reminder
+                    </button>
+                    {reminderEnabled && (
+                      <select
+                        value={reminderTime}
+                        onChange={(e) => setReminderTime(e.target.value as ReminderTime)}
+                        className="py-1.5 px-2 text-xs rounded-lg border border-gray-200 bg-white"
+                      >
+                        {reminderOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

@@ -13,14 +13,15 @@ import { DailyShloka } from './components/DailyShloka';
 import { MoodChatbot } from './components/MoodChatbot';
 import { HabitTracker } from './components/HabitTracker';
 import { Journal } from './components/Journal';
-import { ListBullets, Target, BookOpen } from '@phosphor-icons/react';
+import { CalendarView } from './components/CalendarView';
+import { ListBullets, Target, BookOpen, Calendar } from '@phosphor-icons/react';
 import { useEnergyStore } from './stores/energyStore';
 import { useTaskStore } from './stores/taskStore';
 import { useThemeStore } from './stores/themeStore';
 import { useNotifications } from './hooks/useNotifications';
 import type { EnergyLevel, Task } from './types';
 
-type Tab = 'tasks' | 'habits' | 'journal';
+type Tab = 'tasks' | 'habits' | 'journal' | 'calendar';
 
 function App() {
   const { level, checkIn, shouldPromptCheckIn } = useEnergyStore();
@@ -120,6 +121,12 @@ function App() {
             icon={<BookOpen size={20} />}
             label="Journal"
           />
+          <TabButton
+            active={activeTab === 'calendar'}
+            onClick={() => setActiveTab('calendar')}
+            icon={<Calendar size={20} />}
+            label="Calendar"
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -144,6 +151,10 @@ function App() {
 
             {activeTab === 'journal' && (
               <Journal />
+            )}
+
+            {activeTab === 'calendar' && (
+              <CalendarView />
             )}
           </div>
           

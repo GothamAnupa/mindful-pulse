@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuid } from 'uuid';
-import type { Task, TaskEnergy, Subtask } from '../types';
+import type { Task, TaskEnergy, Subtask, ReminderTime } from '../types';
 
 interface NewTaskInput {
   title: string;
@@ -11,6 +11,8 @@ interface NewTaskInput {
   dueDate?: Date;
   notes?: string;
   subtasks?: Subtask[];
+  reminderEnabled?: boolean;
+  reminderTime?: ReminderTime;
 }
 
 interface TaskStore {
@@ -46,7 +48,9 @@ const sampleTasks: Task[] = [
       { id: uuid(), title: 'Draft summary for leadership', completed: false }
     ],
     completed: false,
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    reminderEnabled: true,
+    reminderTime: '1hour'
   },
   {
     id: uuid(),
@@ -56,7 +60,9 @@ const sampleTasks: Task[] = [
     recurrence: 'none',
     subtasks: [],
     completed: false,
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    reminderEnabled: false,
+    reminderTime: '30min'
   },
   {
     id: uuid(),
@@ -67,7 +73,9 @@ const sampleTasks: Task[] = [
     subtasks: [],
     completed: true,
     completedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    reminderEnabled: true,
+    reminderTime: 'at-time'
   },
   {
     id: uuid(),
@@ -83,7 +91,9 @@ const sampleTasks: Task[] = [
       { id: uuid(), title: 'Sketch rough drafts', completed: false }
     ],
     completed: false,
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    reminderEnabled: false,
+    reminderTime: '30min'
   },
   {
     id: uuid(),
@@ -93,7 +103,9 @@ const sampleTasks: Task[] = [
     recurrence: 'daily',
     subtasks: [],
     completed: false,
-    createdAt: new Date()
+    createdAt: new Date(),
+    reminderEnabled: false,
+    reminderTime: '30min'
   },
   {
     id: uuid(),
@@ -106,7 +118,9 @@ const sampleTasks: Task[] = [
       { id: uuid(), title: 'Research accommodation options', completed: false }
     ],
     completed: false,
-    createdAt: new Date()
+    createdAt: new Date(),
+    reminderEnabled: true,
+    reminderTime: '1day'
   }
 ];
 
@@ -126,7 +140,9 @@ export const useTaskStore = create<TaskStore>()(
           id,
           createdAt: new Date(),
           completed: false,
-          subtasks: taskData.subtasks || []
+          subtasks: taskData.subtasks || [],
+          reminderEnabled: taskData.reminderEnabled || false,
+          reminderTime: taskData.reminderTime || '30min'
         };
         set((state) => ({ tasks: [...state.tasks, newTask] }));
         return id;

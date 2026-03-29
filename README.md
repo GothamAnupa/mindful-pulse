@@ -59,6 +59,18 @@
 - Quiet hours support
 - Three notification styles (Encouraging, Neutral, Minimal)
 
+### 📅 Calendar View
+- Visual monthly calendar
+- Tasks displayed by due date
+- Easy navigation between months
+- Today button for quick access
+
+### ⏰ Task Reminders
+- Set reminders for any task
+- Multiple reminder options (At time, 5/15/30 min, 1 hour, 1 day before)
+- Due date picker when creating tasks
+- Visual indicators for tasks with reminders
+
 ---
 
 ## 🛠️ Tech Stack
@@ -150,6 +162,8 @@ Pulse combines modern productivity with emotional intelligence and ancient wisdo
 - [ ] Team collaboration features
 - [x] Push notifications
 - [x] Dark mode
+- [x] Calendar view
+- [x] Task reminders
 
 ---
 

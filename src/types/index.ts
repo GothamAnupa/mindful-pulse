@@ -6,6 +6,16 @@ export type Category = 'work' | 'personal' | 'health' | 'creative';
 
 export type Recurrence = 'none' | 'daily' | 'weekly' | 'custom';
 
+export type ReminderTime = 'at-time' | '5min' | '15min' | '30min' | '1hour' | '1day';
+
+export interface Reminder {
+  id: string;
+  taskId: string;
+  time: Date;
+  type: ReminderTime;
+  notified: boolean;
+}
+
 export interface Subtask {
   id: string;
   title: string;
@@ -25,6 +35,8 @@ export interface Task {
   completedAt?: Date;
   createdAt: Date;
   snoozedUntil?: Date;
+  reminderEnabled: boolean;
+  reminderTime: ReminderTime;
 }
 
 export interface EnergyState {
