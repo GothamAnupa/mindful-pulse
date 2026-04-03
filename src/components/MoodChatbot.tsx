@@ -161,7 +161,34 @@ export function MoodChatbot() {
   };
 
   const handleSuggestionClick = (suggestion: string) => {
-    handleUserMessage(`I'd like to: ${suggestion}`);
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      text: suggestion
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    const affirmationResponses: Record<MoodType, string> = {
+      great: "That's the spirit! 🌟 You're ready to tackle anything. Remember to pace yourself and enjoy the process!",
+      good: "Great choice! 👍 Keep that steady energy flowing. You've got everything you need to succeed!",
+      okay: "That's a thoughtful choice. 🪷 Be gentle with yourself as you take this step. Every small action matters!",
+      bad: "I appreciate you taking this step. 🌧️ Even small actions can help shift your energy. Be kind to yourself!",
+      struggling: "Thank you for sharing that. 💙 You don't have to do anything big right now. Just breathe - you're doing enough."
+    };
+
+    setTimeout(() => {
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        text: affirmationResponses[detectedMood || 'okay'],
+        suggestions: [
+          "Tell me more about how you're feeling",
+          "I need something else",
+          "That helps, thank you"
+        ]
+      };
+      setMessages(prev => [...prev, botMessage]);
+    }, 800);
   };
 
   const getMoodIcon = (mood: MoodType) => {
