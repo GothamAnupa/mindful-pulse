@@ -142,11 +142,7 @@ export function QuickAddBar({ defaultEnergy = 'medium', onTaskAdded }: QuickAddB
     <>
       <motion.div
         layout
-        className={`
-          fixed bottom-0 left-0 right-0 bg-[var(--color-surface)] border-t border-gray-200 
-          shadow-lg transition-all duration-300 z-40
-          md:max-w-3xl md:left-auto md:right-auto md:rounded-t-xl
-        `}
+        className="fixed bottom-0 left-0 right-0 bg-[var(--color-surface)] border-t border-gray-200 shadow-lg transition-all duration-300 z-40"
       >
         <AnimatePresence>
           {showBreakdown && breakdown && (

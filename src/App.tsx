@@ -102,7 +102,7 @@ function App() {
       
       <main className="max-w-6xl mx-auto px-4 pb-32">
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 mt-4 overflow-x-auto">
+        <div className="flex gap-2 mb-6 mt-4">
           <TabButton
             active={activeTab === 'tasks'}
             onClick={() => setActiveTab('tasks')}
