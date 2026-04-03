@@ -131,17 +131,48 @@ export function MoodChatbot() {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
 
+    const lowerText = text.toLowerCase();
     const mood = detectMood(text);
     setDetectedMood(mood);
 
     setTimeout(() => {
-      const response = moodResponses[mood];
+      let responseText: string;
+      let newSuggestions: string[];
+
+      if (lowerText.includes('motivation') || lowerText.includes('quote') || lowerText.includes('inspire') || lowerText.includes('motivated')) {
+        const quotes = [
+          "You have the right to work, but never to its fruits. - Bhagavad Gita",
+          "The mind is everything. What you think you become. - Buddha",
+          "Be the change you wish to see in the world. - Gandhi",
+          "Success is not final, failure is not fatal. - Churchill",
+          "The only way to do great work is to love what you do. - Jobs"
+        ];
+        responseText = `Here's some motivation for you: ✨\n\n"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+        newSuggestions = ["Tell me more", "I need more motivation", "Thank you"];
+      }
+      else if (lowerText.includes('thank') || lowerText.includes('thanks')) {
+        responseText = "You're welcome! 🙏 I'm always here for you. Remember, every day is a fresh start!";
+        newSuggestions = ["How are you?", "I need motivation", "Goodbye"];
+      }
+      else if (lowerText.includes('goodbye') || lowerText.includes('bye') || lowerText.includes('close')) {
+        responseText = "Take care! 🌸 Remember, you are capable of amazing things. Come back anytime you need support!";
+        newSuggestions = [];
+      }
+      else if (lowerText.includes('how are you') || lowerText.includes('how do you do')) {
+        responseText = "I'm here and ready to support you! 💜 How are you feeling right now?";
+        newSuggestions = ["Feeling great!", "Not so good", "Just okay"];
+      }
+      else {
+        const response = moodResponses[mood];
+        responseText = response.greeting;
+        newSuggestions = response.suggestions;
+      }
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        text: response.greeting,
-        suggestions: response.suggestions
+        text: responseText,
+        suggestions: newSuggestions
       };
 
       setMessages(prev => [...prev, botMessage]);
@@ -168,24 +199,129 @@ export function MoodChatbot() {
     };
     setMessages(prev => [...prev, userMessage]);
 
-    const affirmationResponses: Record<MoodType, string> = {
-      great: "That's the spirit! 🌟 You're ready to tackle anything. Remember to pace yourself and enjoy the process!",
-      good: "Great choice! 👍 Keep that steady energy flowing. You've got everything you need to succeed!",
-      okay: "That's a thoughtful choice. 🪷 Be gentle with yourself as you take this step. Every small action matters!",
-      bad: "I appreciate you taking this step. 🌧️ Even small actions can help shift your energy. Be kind to yourself!",
-      struggling: "Thank you for sharing that. 💙 You don't have to do anything big right now. Just breathe - you're doing enough."
-    };
+    const lowerSuggestion = suggestion.toLowerCase();
+    let responseText: string;
+    let newSuggestions: string[];
+
+    if (lowerSuggestion.includes('challenge') || lowerSuggestion.includes('task')) {
+      responseText = "That's the spirit! 🌟 Break it into small steps and tackle one at a time. You've got this!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('share') || lowerSuggestion.includes('positivit') || lowerSuggestion.includes('someone')) {
+      responseText = "What a beautiful thought! 💫 Sharing positivity can brighten someone's day - including your own!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('bigger') || lowerSuggestion.includes('goals')) {
+      responseText = "I love your ambition! 🚀 Dream big, but remember to celebrate small wins along the way!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('kind') || lowerSuggestion.includes('yourself')) {
+      responseText = "Self-care is so important! 🛀 You deserve kindness, especially from yourself. Take that moment!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('focus') || lowerSuggestion.includes('important')) {
+      responseText = "Focus creates progress! 🎯 One task at a time - you've built the foundation, now complete it!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('walk') || lowerSuggestion.includes('energy')) {
+      responseText = "Movement creates momentum! 👟 A short walk can reset your mind and boost creativity!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('connect') || lowerSuggestion.includes('friend')) {
+      responseText = "Social connections fuel the soul! 🤝 Reach out - you might brighten their day too!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('plan') || lowerSuggestion.includes('fun')) {
+      responseText = "Planning fun is half the fun! 🎉 Looking forward to something boosts your mood instantly!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('small') || lowerSuggestion.includes('one')) {
+      responseText = "Starting is the hardest part! 💪 Small steps lead to big changes. You're on your way!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('breath') || lowerSuggestion.includes('reset')) {
+      responseText = "Deep breaths bring peace! 🌬️ You control your thoughts, not the other way around!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('listen') || lowerSuggestion.includes('music')) {
+      responseText = "Music heals the heart! 🎵 Let your favorite song lift your spirits right now!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('patient') || lowerSuggestion.includes('yourself')) {
+      responseText = "Being patient with yourself is true wisdom! 🌸 You are doing the best you can!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('rest') || lowerSuggestion.includes('permission')) {
+      responseText = "Rest is productive! 😴 Sometimes the bravest thing you can do is pause and breathe.";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('gratitude')) {
+      responseText = "Gratitude shifts your perspective! 🙏 Starting a gratitude list can change your whole day!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('reach')) {
+      responseText = "You don't have to carry this alone! 🤝 Connection is the key to strength. Reach out!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('gentle') || lowerSuggestion.includes('nurturing') || lowerSuggestion.includes('nurture')) {
+      responseText = "Be gentle with yourself! 🧘 Treat yourself like you'd treat a dear friend - with kindness.";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('deep breath') || lowerSuggestion.includes('safe')) {
+      responseText = "You are safe right now! 🌸 Take a moment - one breath at a time. You're stronger than you know.";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('small') || lowerSuggestion.includes('do')) {
+      responseText = "Even tiny steps matter! 👣 You showed up today, and that's enough. Be proud!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('help') || lowerSuggestion.includes('strength') || lowerSuggestion.includes('weakness')) {
+      responseText = "Asking for help is incredible strength! 💪 Vulnerability is not weakness - it's courage!";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('get through') || lowerSuggestion.includes('moment')) {
+      responseText = "Surviving this moment is enough! ⏳ You don't need to solve everything right now. Just breathe.";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('tell me more') || lowerSuggestion.includes('feeling')) {
+      responseText = "I understand. 💙 Would you like to share more, or would some motivation help?";
+      newSuggestions = ["Tell me more", "I need motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('need something else') || lowerSuggestion.includes('else')) {
+      const mood = detectedMood || 'okay';
+      const moreOptions = {
+        great: "What would you like to talk about? 🌟",
+        good: "What can I help you with? 😊",
+        okay: "What do you need right now? 🪷",
+        bad: "I'm here for you. 🌧️ What would help?",
+        struggling: "Take your time. 💙 What do you need?"
+      };
+      responseText = moreOptions[mood];
+      newSuggestions = ["I need motivation", "Tell me about myself", "Goodbye"];
+    }
+    else if (lowerSuggestion.includes('thank')) {
+      responseText = "You're so welcome! 🙏 Remember, I'm always here whenever you need support. Take care!";
+      newSuggestions = ["How are you?", "I need motivation", "Goodbye"];
+    }
+    else {
+      const mood = detectedMood || 'okay';
+      const defaultResponses: Record<MoodType, string> = {
+        great: "That's great to hear! 🌟 Anything else you'd like to share?",
+        good: "Good to know! 😊 What's on your mind?",
+        okay: "I hear you. 🪷 What would be helpful right now?",
+        bad: "I understand. 🌧️ Take your time, I'm here.",
+        struggling: "I'm here for you. 💙 No pressure at all."
+      };
+      responseText = defaultResponses[mood];
+      newSuggestions = ["I need motivation", "Tell me more", "Thank you"];
+    }
 
     setTimeout(() => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'bot',
-        text: affirmationResponses[detectedMood || 'okay'],
-        suggestions: [
-          "Tell me more about how you're feeling",
-          "I need something else",
-          "That helps, thank you"
-        ]
+        text: responseText,
+        suggestions: newSuggestions
       };
       setMessages(prev => [...prev, botMessage]);
     }, 800);
