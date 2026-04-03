@@ -145,10 +145,13 @@ export function MoodChatbot() {
           "The mind is everything. What you think you become. - Buddha",
           "Be the change you wish to see in the world. - Gandhi",
           "Success is not final, failure is not fatal. - Churchill",
-          "The only way to do great work is to love what you do. - Jobs"
+          "The only way to do great work is to love what you do. - Jobs",
+          "Every expert was once a beginner. - Roosevelt",
+          "Your only limit is your mind. - Unknown",
+          "Dream big, start small, act now. - Unknown"
         ];
         responseText = `Here's some motivation for you: ✨\n\n"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
-        newSuggestions = ["Tell me more", "I need more motivation", "Thank you"];
+        newSuggestions = ["More motivation please", "I need help", "Thank you"];
       }
       else if (lowerText.includes('thank') || lowerText.includes('thanks')) {
         responseText = "You're welcome! 🙏 I'm always here for you. Remember, every day is a fresh start!";
@@ -161,6 +164,14 @@ export function MoodChatbot() {
       else if (lowerText.includes('how are you') || lowerText.includes('how do you do')) {
         responseText = "I'm here and ready to support you! 💜 How are you feeling right now?";
         newSuggestions = ["Feeling great!", "Not so good", "Just okay"];
+      }
+      else if (lowerText.includes('help') || lowerText.includes('need') || lowerText.includes('want')) {
+        responseText = "I'm here to help! 💪 What would you like to talk about or need support with?";
+        newSuggestions = ["I need motivation", "Tell me something positive", "I'm feeling down"];
+      }
+      else if (lowerText.includes('feeling') || lowerText.includes('emotion')) {
+        responseText = "It's great that you're checking in with yourself! 💙 How are you really feeling?";
+        newSuggestions = ["I'm feeling good", "Not great honestly", "Just okay"];
       }
       else {
         const response = moodResponses[mood];
@@ -302,6 +313,70 @@ export function MoodChatbot() {
     else if (lowerSuggestion.includes('thank')) {
       responseText = "You're so welcome! 🙏 Remember, I'm always here whenever you need support. Take care!";
       newSuggestions = ["How are you?", "I need motivation", "Goodbye"];
+    }
+    else if (lowerSuggestion.includes('more motivation') || lowerSuggestion.includes('more quote') || (lowerSuggestion.includes('need') && lowerSuggestion.includes('motivation'))) {
+      const moreQuotes = [
+        "The only way to do great work is to love what you do. - Steve Jobs",
+        "Believe you can and you're halfway there. - Theodore Roosevelt",
+        "It does not matter how slowly you go as long as you do not stop. - Confucius",
+        "Success is not final, failure is not fatal. - Winston Churchill",
+        "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt"
+      ];
+      responseText = `Here's another one: ✨\n\n"${moreQuotes[Math.floor(Math.random() * moreQuotes.length)]}"`;
+      newSuggestions = ["One more please", "I need help with something", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('one more') || lowerSuggestion.includes('another')) {
+      const finalQuotes = [
+        "You are never too old to set another goal or to dream a new dream. - C.S. Lewis",
+        "The secret of getting ahead is getting started. - Mark Twain",
+        "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+        "You have the power to create your own journey. - Unknown",
+        "Every moment is a fresh beginning. - T.S. Eliot"
+      ];
+      responseText = `Here's your last dose of inspiration: 💫\n\n"${finalQuotes[Math.floor(Math.random() * finalQuotes.length)]}"`;
+      newSuggestions = ["I'm feeling better now", "Thank you", "Goodbye"];
+    }
+    else if (lowerSuggestion.includes('positive') || lowerSuggestion.includes('something good') || lowerSuggestion.includes('good news')) {
+      responseText = "Here's something positive: 🌟 You're here, you're trying, and that's already more than enough. Every small step counts!";
+      newSuggestions = ["Tell me more", "I need more motivation", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('down') || lowerSuggestion.includes('sad') || lowerSuggestion.includes('low')) {
+      const supportiveResponses = [
+        "I'm sorry you're feeling this way. 💙 Remember, this feeling is temporary. You've gotten through hard days before, and you'll get through this too.",
+        "It's okay to feel down sometimes. 🌧️ Be gentle with yourself - you're doing the best you can with what you have right now.",
+        "I hear you. 💜 You don't have to pretend to be okay. Let yourself feel, and know that better days are coming."
+      ];
+      responseText = supportiveResponses[Math.floor(Math.random() * supportiveResponses.length)];
+      newSuggestions = ["Tell me more", "I need motivation", "Just needed to talk"];
+    }
+    else if (lowerSuggestion.includes('better') || lowerSuggestion.includes('good now') || lowerSuggestion.includes('better now')) {
+      responseText = "That's wonderful to hear! 🌟 I'm so glad you're feeling better. Remember, I'm always here whenever you need me!";
+      newSuggestions = ["Thanks!", "Let's chat more", "Goodbye"];
+    }
+    else if (lowerSuggestion.includes('need something') || lowerSuggestion.includes('help me') || lowerSuggestion.includes('can you help')) {
+      const mood = detectedMood || 'okay';
+      const helpResponses = {
+        great: "That's the spirit! 🌟 What would you like to achieve? Let's make it happen!",
+        good: "Great! 😊 What can I help you with today?",
+        okay: "Of course! 🪷 What's on your mind? I'm here to help.",
+        bad: "I'm here for you. 🌧️ Tell me what you need, and let's work through it together.",
+        struggling: "Take your time. 💙 There's no rush. What do you need?"
+      };
+      responseText = helpResponses[mood];
+      newSuggestions = ["I need motivation", "Tell me something", "Thank you"];
+    }
+    else if (lowerSuggestion.includes('just needed') || lowerSuggestion.includes('just talk') || lowerSuggestion.includes('talk')) {
+      responseText = "I'm always here to chat! 💜 Sometimes just talking helps. What's on your mind?";
+      newSuggestions = ["Tell me about your day", "I need motivation", "Nothing, thanks"];
+    }
+    else if (lowerSuggestion.includes('day') || lowerSuggestion.includes('today')) {
+      const dayResponses = [
+        "Every day is a fresh start! 🌅 What made today special for you?",
+        "Today is a gift - that's why we call it the present! 🎁 What was the best part of your day?",
+        "Days may repeat, but each one offers something new. ✨ What made you smile today?"
+      ];
+      responseText = dayResponses[Math.floor(Math.random() * dayResponses.length)];
+      newSuggestions = ["Tell me more", "I need motivation", "Good"];
     }
     else {
       const mood = detectedMood || 'okay';
