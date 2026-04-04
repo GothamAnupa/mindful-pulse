@@ -430,10 +430,9 @@ export function MoodChatbot() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 md:right-8 w-14 h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg flex items-center justify-center z-50"
+        className="fixed bottom-36 right-4 md:right-8 w-14 h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg flex items-center justify-center z-40"
       >
         <ChatCircle size={28} weight="fill" />
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white" />
       </motion.button>
 
       <AnimatePresence>
@@ -442,7 +441,7 @@ export function MoodChatbot() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-32 right-4 md:right-8 w-[calc(100vw-2rem)] md:w-96 max-h-[70vh] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden"
+            className="fixed bottom-44 right-4 md:right-8 w-[calc(100vw-2rem)] md:w-96 max-h-[70vh] bg-white rounded-2xl shadow-2xl z-40 flex flex-col overflow-hidden"
           >
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
