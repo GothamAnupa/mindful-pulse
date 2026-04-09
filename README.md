@@ -1,4 +1,4 @@
-# Pulse – Emotionally Intelligent To-Do App
+# Mindful Pulse – Emotionally Intelligent To-Do App
 
 > *"An app that knows your energy, adapts to your mood, and helps you focus on what matters - because you're not a machine."*
 
