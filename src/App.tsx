@@ -23,11 +23,27 @@ import type { EnergyLevel, Task } from './types';
 type Tab = 'tasks' | 'habits' | 'calendar';
 
 function App() {
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, logout, checkAuth, loading } = useAuthStore();
   const { level, checkIn } = useEnergyStore();
   const { tasks, initializeSampleTasks } = useTaskStore();
   const { theme } = useThemeStore();
   const [showCheckIn, setShowCheckIn] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth().then(() => setAuthLoading(false));
+  }, [checkAuth]);
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   const [activeTimerTaskId, setActiveTimerTaskId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);

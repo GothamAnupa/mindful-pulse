@@ -1,100 +1,115 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  createdAt: Date;
-}
+import { supabase } from '../lib/supabase';
+import type { User } from '../lib/supabase';
 
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
+  loading: boolean;
+  checkAuth: () => Promise<void>;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
-  logout: () => void;
-  updateName: (name: string) => void;
+  logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
-      isAuthenticated: false,
-      user: null,
+export const useAuthStore = create<AuthState>()((set) => ({
+  isAuthenticated: false,
+  user: null,
+  loading: true,
 
-      login: async (email: string, password: string) => {
-        if (!email || !password) return false;
-        
-        const storedUsers = JSON.parse(localStorage.getItem('pulse_users') || '[]');
-        const foundUser = storedUsers.find((u: any) => u.email === email && u.password === btoa(password));
-        
-        if (foundUser) {
-          set({ 
-            isAuthenticated: true, 
-            user: { 
-              id: foundUser.id, 
-              email: foundUser.email, 
-              name: foundUser.name,
-              createdAt: foundUser.createdAt
-            } 
-          });
-          return true;
-        }
-        return false;
-      },
-
-      signup: async (email: string, password: string, name: string) => {
-        if (!email || !password || !name) return false;
-        
-        const storedUsers = JSON.parse(localStorage.getItem('pulse_users') || '[]');
-        
-        if (storedUsers.find((u: any) => u.email === email)) {
-          return false;
-        }
-        
-        const newUser = {
-          id: crypto.randomUUID(),
-          email,
-          password: btoa(password),
-          name,
-          createdAt: new Date().toISOString()
-        };
-        
-        storedUsers.push(newUser);
-        localStorage.setItem('pulse_users', JSON.stringify(storedUsers));
+  checkAuth: async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
         
         set({ 
           isAuthenticated: true, 
+          user: userData as User,
+          loading: false 
+        });
+      } else {
+        set({ loading: false });
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      set({ loading: false });
+    }
+  },
+
+  login: async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        console.error('Login error:', error);
+        return false;
+      }
+
+      if (data.user) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+
+        set({ isAuthenticated: true, user: userData as User });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
+  },
+
+  signup: async (email: string, password: string, name: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name } }
+      });
+
+      if (error) {
+        console.error('Signup error:', error);
+        return false;
+      }
+
+      if (data.user) {
+        await supabase.from('users').insert({
+          id: data.user.id,
+          email,
+          name
+        });
+
+        set({ 
+          isAuthenticated: true, 
           user: { 
-            id: newUser.id, 
-            email: newUser.email, 
-            name: newUser.name,
-            createdAt: new Date(newUser.createdAt)
-          } 
+            id: data.user.id, 
+            email, 
+            name, 
+            created_at: new Date().toISOString() 
+          }
         });
         return true;
-      },
-
-      logout: () => {
-        set({ isAuthenticated: false, user: null });
-      },
-
-      updateName: (name: string) => {
-        const currentUser = get().user;
-        if (currentUser) {
-          set({ user: { ...currentUser, name } });
-          
-          const storedUsers = JSON.parse(localStorage.getItem('pulse_users') || '[]');
-          const updatedUsers = storedUsers.map((u: any) => 
-            u.id === currentUser.id ? { ...u, name } : u
-          );
-          localStorage.setItem('pulse_users', JSON.stringify(updatedUsers));
-        }
       }
-    }),
-    {
-      name: 'pulse-auth'
+      return false;
+    } catch (error) {
+      console.error('Signup error:', error);
+      return false;
     }
-  )
-);
+  },
+
+  logout: async () => {
+    await supabase.auth.signOut();
+    set({ isAuthenticated: false, user: null });
+  }
+}));
