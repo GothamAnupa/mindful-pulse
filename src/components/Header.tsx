@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Gear, Sun, Moon, CloudSun } from '@phosphor-icons/react';
+import { Gear, Sun, Moon, CloudSun, SignOut } from '@phosphor-icons/react';
 import { useEnergyStore } from '../stores/energyStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { getEnergyEmoji, getEnergyLabel } from './EnergySelector';
@@ -7,9 +7,10 @@ import { getEncouragementMessage } from '../utils/aiSimulation';
 
 interface HeaderProps {
   onOpenCheckIn: () => void;
+  onLogout?: () => void;
 }
 
-export function Header({ onOpenCheckIn }: HeaderProps) {
+export function Header({ onOpenCheckIn, onLogout }: HeaderProps) {
   const { level } = useEnergyStore();
   const { openSettings } = useSettingsStore();
 
@@ -85,6 +86,18 @@ export function Header({ onOpenCheckIn }: HeaderProps) {
             >
               <Gear size={24} className="text-[var(--color-muted)]" />
             </motion.button>
+
+            {onLogout && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onLogout}
+                className="p-3 rounded-xl bg-red-50 border border-red-200 hover:border-red-400 shadow-sm transition-all"
+                title="Sign out"
+              >
+                <SignOut size={24} className="text-red-500" />
+              </motion.button>
+            )}
           </div>
         </div>
 
