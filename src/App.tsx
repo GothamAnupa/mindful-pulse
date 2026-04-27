@@ -9,25 +9,24 @@ import { WeeklyInsights } from './components/WeeklyInsights';
 import { CheckInModal } from './components/CheckInModal';
 import { SettingsPanel } from './components/SettingsPanel';
 import { Confetti } from './components/Confetti';
-import { DailyShloka } from './components/DailyShloka';
 import { MoodChatbot } from './components/MoodChatbot';
 import { HabitTracker } from './components/HabitTracker';
-import { Journal } from './components/Journal';
 import { CalendarView } from './components/CalendarView';
-import { ListBullets, Target, BookOpen, Calendar } from '@phosphor-icons/react';
+import { AuthScreen } from './components/AuthScreen';
+import { ListBullets, Target, Calendar } from '@phosphor-icons/react';
 import { useEnergyStore } from './stores/energyStore';
 import { useTaskStore } from './stores/taskStore';
 import { useThemeStore } from './stores/themeStore';
-import { useNotifications } from './hooks/useNotifications';
+import { useAuthStore } from './stores/authStore';
 import type { EnergyLevel, Task } from './types';
 
-type Tab = 'tasks' | 'habits' | 'journal' | 'calendar';
+type Tab = 'tasks' | 'habits' | 'calendar';
 
 function App() {
-  const { level, checkIn, shouldPromptCheckIn } = useEnergyStore();
+  const { isAuthenticated, logout } = useAuthStore();
+  const { level, checkIn } = useEnergyStore();
   const { tasks, initializeSampleTasks } = useTaskStore();
   const { theme } = useThemeStore();
-  const { notifyCheckIn, notifyWeeklyInsights } = useNotifications();
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [activeTimerTaskId, setActiveTimerTaskId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -35,43 +34,30 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>('tasks');
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     if (tasks.length === 0 && !isInitialized) {
       initializeSampleTasks();
       setIsInitialized(true);
     }
-  }, [tasks, initializeSampleTasks, isInitialized]);
+  }, [isAuthenticated, tasks.length, initializeSampleTasks, isInitialized]);
 
   useEffect(() => {
-    if (shouldPromptCheckIn()) {
-      const timer = setTimeout(() => {
-        setShowCheckIn(true);
-        notifyCheckIn();
-      }, 1000);
-      return () => clearTimeout(timer);
+    if (!isAuthenticated) return;
+    const timer = setTimeout(() => setShowCheckIn(true), 3000);
+    return () => clearTimeout(timer);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
     }
-  }, [shouldPromptCheckIn, notifyCheckIn]);
-
-  useEffect(() => {
-    const checkWeeklyInsights = () => {
-      const now = new Date();
-      if (now.getDay() === 0 && now.getHours() === 10) {
-        notifyWeeklyInsights();
-      }
-    };
-    
-    const interval = setInterval(checkWeeklyInsights, 3600000);
-    return () => clearInterval(interval);
-  }, [notifyWeeklyInsights]);
-
-  useEffect(() => {
-    const isDarkMode = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.body.classList.toggle('dark', isDarkMode);
   }, [theme]);
 
   useEffect(() => {
-    const isDarkMode = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.body.className = `energy-${level}${isDarkMode ? ' dark' : ''}`;
-  }, [level, theme]);
+    document.body.className = `energy-${level}`;
+  }, [level]);
 
   const handleEnergySelect = useCallback((newLevel: EnergyLevel) => {
     checkIn(newLevel);
@@ -91,6 +77,10 @@ function App() {
 
   const incompleteTasks = tasks.filter((t: Task) => !t.completed);
 
+  if (!isAuthenticated) {
+    return <AuthScreen />;
+  }
+
   return (
     <div className="min-h-screen transition-colors duration-500">
       <Confetti 
@@ -98,10 +88,9 @@ function App() {
         onComplete={() => setShowConfetti(false)} 
       />
       
-      <Header onOpenCheckIn={handleOpenCheckIn} />
+      <Header onOpenCheckIn={handleOpenCheckIn} onLogout={logout} />
       
       <main className="max-w-6xl mx-auto px-4 pb-32">
-        {/* Tab Navigation */}
         <div className="flex gap-2 mb-6 mt-4">
           <TabButton
             active={activeTab === 'tasks'}
@@ -116,12 +105,6 @@ function App() {
             label="Habits"
           />
           <TabButton
-            active={activeTab === 'journal'}
-            onClick={() => setActiveTab('journal')}
-            icon={<BookOpen size={20} />}
-            label="Journal"
-          />
-          <TabButton
             active={activeTab === 'calendar'}
             onClick={() => setActiveTab('calendar')}
             icon={<Calendar size={20} />}
@@ -134,7 +117,6 @@ function App() {
             {activeTab === 'tasks' && (
               <>
                 <FocusSection onStartTimer={handleStartTimer} />
-                
                 <div>
                   <h2 className="text-xl font-semibold mb-4">Task Pipeline</h2>
                   <TaskPipeline 
@@ -149,17 +131,12 @@ function App() {
               <HabitTracker />
             )}
 
-            {activeTab === 'journal' && (
-              <Journal />
-            )}
-
             {activeTab === 'calendar' && (
               <CalendarView />
             )}
           </div>
           
           <div className="space-y-6">
-            <DailyShloka />
             <WeeklyInsights />
             
             {activeTimerTaskId && activeTab === 'tasks' && (
