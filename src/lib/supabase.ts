@@ -1,9 +1,17 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://upcpdbormlowaabbqdap.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwY3BkYm9ybWxvd2FhYmJxZGFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwNTY5NjYsImV4cCI6MjA2MzYzMTk2Nn0.Publishable_Key';
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// This needs to be your real anon key from Supabase → Settings → API
+// It should start with "eyJ..."
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder';
+
+export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true
+  }
+});
 
 export interface User {
   id: string;
@@ -11,3 +19,8 @@ export interface User {
   name: string;
   created_at: string;
 }
+
+// Helper to check if Supabase is configured
+export const isSupabaseConfigured = () => {
+  return supabaseKey.startsWith('eyJ') && !supabaseKey.includes('placeholder');
+};
