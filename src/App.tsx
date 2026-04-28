@@ -31,7 +31,9 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth().then(() => setAuthLoading(false));
+    checkAuth()
+      .catch(() => {})
+      .finally(() => setAuthLoading(false));
   }, [checkAuth]);
 
   if (authLoading || loading) {

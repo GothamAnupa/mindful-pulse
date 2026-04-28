@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
         set({ loading: false });
       }
     } catch (error) {
-      console.error('Auth check error:', error);
+      console.log('Auth check - showing login');
       set({ loading: false });
     }
   },
@@ -48,24 +48,21 @@ export const useAuthStore = create<AuthState>()((set) => ({
         password
       });
 
-      if (error) {
-        console.error('Login error:', error);
+      if (error || !data.user) {
+        console.log('Login failed:', error?.message);
         return false;
       }
 
-      if (data.user) {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
+      const { data: userData } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
 
-        set({ isAuthenticated: true, user: userData as User });
-        return true;
-      }
-      return false;
+      set({ isAuthenticated: true, user: userData as User });
+      return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.log('Login error');
       return false;
     }
   },
@@ -78,32 +75,29 @@ export const useAuthStore = create<AuthState>()((set) => ({
         options: { data: { name } }
       });
 
-      if (error) {
-        console.error('Signup error:', error);
+      if (error || !data.user) {
+        console.log('Signup failed:', error?.message);
         return false;
       }
 
-      if (data.user) {
-        await supabase.from('users').insert({
-          id: data.user.id,
-          email,
-          name
-        });
+      await supabase.from('users').insert({
+        id: data.user.id,
+        email,
+        name
+      });
 
-        set({ 
-          isAuthenticated: true, 
-          user: { 
-            id: data.user.id, 
-            email, 
-            name, 
-            created_at: new Date().toISOString() 
-          }
-        });
-        return true;
-      }
-      return false;
+      set({ 
+        isAuthenticated: true, 
+        user: { 
+          id: data.user.id, 
+          email, 
+          name, 
+          created_at: new Date().toISOString() 
+        }
+      });
+      return true;
     } catch (error) {
-      console.error('Signup error:', error);
+      console.log('Signup error');
       return false;
     }
   },
